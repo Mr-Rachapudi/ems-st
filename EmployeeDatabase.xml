@@ -1,0 +1,133 @@
+<?xml version="1.0"?>
+<st-source>
+<class>
+<class-id>EmployeeDatabase</class-id>
+<superclass>Object</superclass>
+<instance-variables>connection</instance-variables>
+<class-variables>Instance</class-variables>
+<pool-dictionaries></pool-dictionaries>
+<methods>
+<body package="EmployeeManagement-Database" selector="initialize">
+initialize
+    super initialize.
+    self initializeDatabase.
+</body>
+<body package="EmployeeManagement-Database" selector="initializeDatabase">
+initializeDatabase
+    | dbPath |
+    dbPath := 'employees.db'.
+    connection := SQLiteConnection on: dbPath.
+    connection open.
+    self createEmployeeTable.
+</body>
+<body package="EmployeeManagement-Database" selector="createEmployeeTable">
+createEmployeeTable
+    | sql |
+    sql := 'CREATE TABLE IF NOT EXISTS employees (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL,
+        email TEXT NOT NULL UNIQUE,
+        department TEXT NOT NULL,
+        salary REAL NOT NULL,
+        hire_date TEXT NOT NULL
+    )'.
+    connection execute: sql.
+</body>
+<body package="EmployeeManagement-Database" selector="insertEmployee:">
+insertEmployee: anEmployee
+    | sql statement |
+    sql := 'INSERT INTO employees (name, email, department, salary, hire_date) VALUES (?, ?, ?, ?, ?)'.
+    statement := connection prepare: sql.
+    statement
+        bind: 1 to: anEmployee name;
+        bind: 2 to: anEmployee email;
+        bind: 3 to: anEmployee department;
+        bind: 4 to: anEmployee salary;
+        bind: 5 to: anEmployee hireDate asString.
+    statement execute.
+    anEmployee id: connection lastInsertRowId.
+    statement finalize.
+    ^anEmployee
+</body>
+<body package="EmployeeManagement-Database" selector="findEmployeeById:">
+findEmployeeById: anId
+    | sql statement result employee |
+    sql := 'SELECT id, name, email, department, salary, hire_date FROM employees WHERE id = ?'.
+    statement := connection prepare: sql.
+    statement bind: 1 to: anId.
+    result := statement step.
+    result ifTrue: [
+        employee := Employee new
+            id: (statement columnAt: 1);
+            name: (statement columnAt: 2);
+            email: (statement columnAt: 3);
+            department: (statement columnAt: 4);
+            salary: (statement columnAt: 5);
+            hireDate: (Date fromString: (statement columnAt: 6));
+            yourself.
+    ].
+    statement finalize.
+    ^employee
+</body>
+<body package="EmployeeManagement-Database" selector="findAllEmployees">
+findAllEmployees
+    | sql statement employees employee |
+    employees := OrderedCollection new.
+    sql := 'SELECT id, name, email, department, salary, hire_date FROM employees ORDER BY name'.
+    statement := connection prepare: sql.
+    [statement step] whileTrue: [
+        employee := Employee new
+            id: (statement columnAt: 1);
+            name: (statement columnAt: 2);
+            email: (statement columnAt: 3);
+            department: (statement columnAt: 4);
+            salary: (statement columnAt: 5);
+            hireDate: (Date fromString: (statement columnAt: 6));
+            yourself.
+        employees add: employee.
+    ].
+    statement finalize.
+    ^employees
+</body>
+<body package="EmployeeManagement-Database" selector="updateEmployee:">
+updateEmployee: anEmployee
+    | sql statement |
+    sql := 'UPDATE employees SET name = ?, email = ?, department = ?, salary = ?, hire_date = ? WHERE id = ?'.
+    statement := connection prepare: sql.
+    statement
+        bind: 1 to: anEmployee name;
+        bind: 2 to: anEmployee email;
+        bind: 3 to: anEmployee department;
+        bind: 4 to: anEmployee salary;
+        bind: 5 to: anEmployee hireDate asString;
+        bind: 6 to: anEmployee id.
+    statement execute.
+    statement finalize.
+    ^anEmployee
+</body>
+<body package="EmployeeManagement-Database" selector="deleteEmployee:">
+deleteEmployee: anEmployee
+    | sql statement |
+    sql := 'DELETE FROM employees WHERE id = ?'.
+    statement := connection prepare: sql.
+    statement bind: 1 to: anEmployee id.
+    statement execute.
+    statement finalize.
+</body>
+<body package="EmployeeManagement-Database" selector="close">
+close
+    connection ifNotNil: [connection close. connection := nil].
+</body>
+<body package="EmployeeManagement-Database" selector="EmployeeDatabase class>>instance">
+instance
+    Instance ifNil: [Instance := self new].
+    ^Instance
+</body>
+<body package="EmployeeManagement-Database" selector="EmployeeDatabase class>>reset">
+reset
+    Instance ifNotNil: [Instance close].
+    Instance := nil.
+</body>
+</methods>
+</class>
+</st-source>

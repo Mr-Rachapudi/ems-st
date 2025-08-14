@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<st-source>
+<class>
+<class-id>EmployeeManagementController</class-id>
+<superclass>Object</superclass>
+<instance-variables>mainWindow service</instance-variables>
+<class-variables>Instance</class-variables>
+<pool-dictionaries></pool-dictionaries>
+<methods>
+<body package="EmployeeManagement-Controller" selector="initialize">
+initialize
+    super initialize.
+    service := EmployeeService instance.
+</body>
+<body package="EmployeeManagement-Controller" selector="start">
+start
+    mainWindow := EmployeeManagementWindow new.
+    mainWindow open.
+    ^mainWindow
+</body>
+<body package="EmployeeManagement-Controller" selector="stop">
+stop
+    mainWindow ifNotNil: [
+        mainWindow close.
+        mainWindow := nil.
+    ].
+</body>
+<body package="EmployeeManagement-Controller" selector="EmployeeManagementController class>>instance">
+instance
+    Instance ifNil: [Instance := self new].
+    ^Instance
+</body>
+<body package="EmployeeManagement-Controller" selector="EmployeeManagementController class>>reset">
+reset
+    Instance ifNotNil: [Instance stop].
+    Instance := nil.
+</body>
+</methods>
+</class>
+</st-source>

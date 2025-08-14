@@ -1,0 +1,108 @@
+<?xml version="1.0"?>
+<st-source>
+<class>
+<class-id>Employee</class-id>
+<superclass>Object</superclass>
+<instance-variables>id name email department salary hireDate</instance-variables>
+<class-variables></class-variables>
+<pool-dictionaries></pool-dictionaries>
+<methods>
+<body package="EmployeeManagement-Model" selector="initialize">
+initialize
+    super initialize.
+    id := nil.
+    name := ''.
+    email := ''.
+    department := ''.
+    salary := 0.
+    hireDate := Date today.
+</body>
+<body package="EmployeeManagement-Model" selector="initializeWithId:name:email:department:salary:hireDate:">
+initializeWithId: anId name: aName email: anEmail department: aDepartment salary: aSalary hireDate: aDate
+    self initialize.
+    id := anId.
+    name := aName.
+    email := anEmail.
+    department := aDepartment.
+    salary := aSalary.
+    hireDate := aDate.
+</body>
+<body package="EmployeeManagement-Model" selector="id">
+id
+    ^id
+</body>
+<body package="EmployeeManagement-Model" selector="id:">
+id: anId
+    id := anId
+</body>
+<body package="EmployeeManagement-Model" selector="name">
+name
+    ^name
+</body>
+<body package="EmployeeManagement-Model" selector="name:">
+name: aName
+    name := aName
+</body>
+<body package="EmployeeManagement-Model" selector="email">
+email
+    ^email
+</body>
+<body package="EmployeeManagement-Model" selector="email:">
+email: anEmail
+    email := anEmail
+</body>
+<body package="EmployeeManagement-Model" selector="department">
+department
+    ^department
+</body>
+<body package="EmployeeManagement-Model" selector="department:">
+department: aDepartment
+    department := aDepartment
+</body>
+<body package="EmployeeManagement-Model" selector="salary">
+salary
+    ^salary
+</body>
+<body package="EmployeeManagement-Model" selector="salary:">
+salary: aSalary
+    salary := aSalary
+</body>
+<body package="EmployeeManagement-Model" selector="hireDate">
+hireDate
+    ^hireDate
+</body>
+<body package="EmployeeManagement-Model" selector="hireDate:">
+hireDate: aDate
+    hireDate := aDate
+</body>
+<body package="EmployeeManagement-Model" selector="displayString">
+displayString
+    ^name, ' (', department, ')'
+</body>
+<body package="EmployeeManagement-Model" selector="isValid">
+isValid
+    ^name notEmpty and: [email notEmpty and: [department notEmpty and: [salary > 0]]]
+</body>
+<body package="EmployeeManagement-Model" selector="asString">
+asString
+    ^'Employee[id=', id printString, ', name=', name, ', email=', email, ', department=', department, ', salary=', salary printString, ', hireDate=', hireDate printString, ']'
+</body>
+<body package="EmployeeManagement-Model" selector="=">
+= anEmployee
+    ^self class = anEmployee class and: [id = anEmployee id]
+</body>
+<body package="EmployeeManagement-Model" selector="hash">
+hash
+    ^id hash
+</body>
+<body package="EmployeeManagement-Model" selector="Employee class>>new">
+new
+    ^super new initialize
+</body>
+<body package="EmployeeManagement-Model" selector="Employee class>>withId:name:email:department:salary:hireDate:">
+withId: anId name: aName email: anEmail department: aDepartment salary: aSalary hireDate: aDate
+    ^self new initializeWithId: anId name: aName email: anEmail department: aDepartment salary: aSalary hireDate: aDate
+</body>
+</methods>
+</class>
+</st-source>

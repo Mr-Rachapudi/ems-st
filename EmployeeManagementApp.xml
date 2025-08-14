@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+<st-source>
+<class>
+<class-id>EmployeeManagementApp</class-id>
+<superclass>Object</superclass>
+<instance-variables></instance-variables>
+<class-variables></class-variables>
+<pool-dictionaries></pool-dictionaries>
+<methods>
+<body package="EmployeeManagement-Application" selector="EmployeeManagementApp class>>main">
+main
+    | controller |
+    [
+        self initializeApplication.
+        controller := EmployeeManagementController instance.
+        controller start.
+    ] on: Error do: [:ex |
+        Transcript show: 'Application startup failed: ', ex messageText; cr.
+        ex pass.
+    ]
+</body>
+<body package="EmployeeManagement-Application" selector="EmployeeManagementApp class>>initializeApplication">
+initializeApplication
+    Transcript show: 'Starting Employee Management System...'; cr.
+    
+    EmployeeService initialize.
+    
+    Transcript show: 'Employee Management System initialized successfully.'; cr.
+</body>
+<body package="EmployeeManagement-Application" selector="EmployeeManagementApp class>>version">
+version
+    ^'1.0.0'
+</body>
+<body package="EmployeeManagement-Application" selector="EmployeeManagementApp class>>title">
+title
+    ^'Employee Management System'
+</body>
+<body package="EmployeeManagement-Application" selector="EmployeeManagementApp class>>description">
+description
+    ^'A complete employee management system built with ObjectStudio ANSI Smalltalk featuring CRUD operations, data validation, Windows GUI, and persistent storage.'
+</body>
+<body package="EmployeeManagement-Application" selector="EmployeeManagementApp class>>start">
+start
+    ^self main
+</body>
+<body package="EmployeeManagement-Application" selector="EmployeeManagementApp class>>stop">
+stop
+    EmployeeManagementController reset.
+    Transcript show: 'Employee Management System stopped.'; cr.
+</body>
+</methods>
+</class>
+</st-source>

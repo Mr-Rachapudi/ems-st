@@ -1,0 +1,75 @@
+Object subclass: #CreateEmployeeValidator
+    instanceVariableNames: ''
+    classVariableNames: ''
+    poolDictionaries: ''
+    category: 'EmployeeManagement-Validation'!
+
+!CreateEmployeeValidator methodsFor: 'validation'!
+
+validateEmployee: anEmployee
+    | errors |
+    errors := OrderedCollection new.
+    
+    self validateName: anEmployee name errors: errors.
+    self validateEmail: anEmployee email errors: errors.
+    self validateDepartment: anEmployee department errors: errors.
+    self validateSalary: anEmployee salary errors: errors.
+    self validateHireDate: anEmployee hireDate errors: errors.
+    
+    ^errors
+!
+
+validateName: aName errors: errors
+    aName ifNil: [errors add: 'Name cannot be nil'. ^self].
+    aName isEmpty ifTrue: [errors add: 'Name cannot be empty'. ^self].
+    aName size < 2 ifTrue: [errors add: 'Name must be at least 2 characters long'. ^self].
+    aName size > 100 ifTrue: [errors add: 'Name cannot exceed 100 characters'. ^self].
+    (aName allSatisfy: [:char | char isLetter or: [char = $ ]]) ifFalse: [
+        errors add: 'Name can only contain letters and spaces'
+    ].
+!
+
+validateEmail: anEmail errors: errors
+    | atIndex dotIndex |
+    anEmail ifNil: [errors add: 'Email cannot be nil'. ^self].
+    anEmail isEmpty ifTrue: [errors add: 'Email cannot be empty'. ^self].
+    anEmail size > 255 ifTrue: [errors add: 'Email cannot exceed 255 characters'. ^self].
+    
+    atIndex := anEmail indexOf: $@.
+    atIndex = 0 ifTrue: [errors add: 'Email must contain @ symbol'. ^self].
+    atIndex = 1 ifTrue: [errors add: 'Email must have characters before @ symbol'. ^self].
+    atIndex = anEmail size ifTrue: [errors add: 'Email must have characters after @ symbol'. ^self].
+    
+    dotIndex := anEmail indexOf: $. startingAt: atIndex.
+    dotIndex = 0 ifTrue: [errors add: 'Email must contain a dot after @ symbol'. ^self].
+    dotIndex = anEmail size ifTrue: [errors add: 'Email must have characters after the dot'. ^self].
+!
+
+validateDepartment: aDepartment errors: errors
+    | validDepartments |
+    validDepartments := #('Engineering' 'Sales' 'Marketing' 'HR' 'Finance' 'Operations' 'IT' 'Legal').
+    
+    aDepartment ifNil: [errors add: 'Department cannot be nil'. ^self].
+    aDepartment isEmpty ifTrue: [errors add: 'Department cannot be empty'. ^self].
+    (validDepartments includes: aDepartment) ifFalse: [
+        errors add: 'Department must be one of: ', (validDepartments joinSeparatedBy: ', ')
+    ].
+!
+
+validateSalary: aSalary errors: errors
+    aSalary ifNil: [errors add: 'Salary cannot be nil'. ^self].
+    aSalary <= 0 ifTrue: [errors add: 'Salary must be greater than 0'. ^self].
+    aSalary > 1000000 ifTrue: [errors add: 'Salary cannot exceed 1,000,000'. ^self].
+!
+
+validateHireDate: aHireDate errors: errors
+    aHireDate ifNil: [errors add: 'Hire date cannot be nil'. ^self].
+    aHireDate > Date today ifTrue: [errors add: 'Hire date cannot be in the future'. ^self].
+    aHireDate < (Date today subtractDays: 36500) ifTrue: [errors add: 'Hire date cannot be more than 100 years ago'. ^self].
+! !
+
+!CreateEmployeeValidator class methodsFor: 'instance creation'!
+
+new
+    ^super new
+! !

@@ -1,0 +1,80 @@
+<?xml version="1.0"?>
+<st-source>
+<class>
+<class-id>ReadEmployeeValidator</class-id>
+<superclass>Object</superclass>
+<instance-variables></instance-variables>
+<class-variables></class-variables>
+<pool-dictionaries></pool-dictionaries>
+<methods>
+<body package="EmployeeManagement-Validation" selector="validateEmployeeId:">
+validateEmployeeId: anId
+    | errors |
+    errors := OrderedCollection new.
+    
+    anId ifNil: [errors add: 'Employee ID cannot be nil'. ^errors].
+    anId isInteger ifFalse: [errors add: 'Employee ID must be an integer'. ^errors].
+    anId <= 0 ifTrue: [errors add: 'Employee ID must be greater than 0'. ^errors].
+    anId > 2147483647 ifTrue: [errors add: 'Employee ID is too large'. ^errors].
+    
+    ^errors
+</body>
+<body package="EmployeeManagement-Validation" selector="validateSearchCriteria:">
+validateSearchCriteria: searchCriteria
+    | errors |
+    errors := OrderedCollection new.
+    
+    searchCriteria ifNil: [^errors].
+    searchCriteria isEmpty ifTrue: [^errors].
+    
+    searchCriteria size > 100 ifTrue: [
+        errors add: 'Search criteria cannot exceed 100 characters'
+    ].
+    
+    ^errors
+</body>
+<body package="EmployeeManagement-Validation" selector="validateDepartmentFilter:">
+validateDepartmentFilter: department
+    | errors validDepartments |
+    errors := OrderedCollection new.
+    validDepartments := #('Engineering' 'Sales' 'Marketing' 'HR' 'Finance' 'Operations' 'IT' 'Legal').
+    
+    department ifNil: [^errors].
+    department isEmpty ifTrue: [^errors].
+    
+    (validDepartments includes: department) ifFalse: [
+        errors add: 'Invalid department filter: ', department
+    ].
+    
+    ^errors
+</body>
+<body package="EmployeeManagement-Validation" selector="validateSalaryRange:to:">
+validateSalaryRange: minSalary to: maxSalary
+    | errors |
+    errors := OrderedCollection new.
+    
+    minSalary ifNotNil: [
+        minSalary < 0 ifTrue: [errors add: 'Minimum salary cannot be negative'].
+        minSalary > 1000000 ifTrue: [errors add: 'Minimum salary cannot exceed 1,000,000'].
+    ].
+    
+    maxSalary ifNotNil: [
+        maxSalary < 0 ifTrue: [errors add: 'Maximum salary cannot be negative'].
+        maxSalary > 1000000 ifTrue: [errors add: 'Maximum salary cannot exceed 1,000,000'].
+    ].
+    
+    (minSalary notNil and: [maxSalary notNil]) ifTrue: [
+        minSalary > maxSalary ifTrue: [
+            errors add: 'Minimum salary cannot be greater than maximum salary'
+        ]
+    ].
+    
+    ^errors
+</body>
+<body package="EmployeeManagement-Validation" selector="ReadEmployeeValidator class>>new">
+new
+    ^super new
+</body>
+</methods>
+</class>
+</st-source>

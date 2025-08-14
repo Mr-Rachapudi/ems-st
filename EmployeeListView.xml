@@ -1,0 +1,57 @@
+<?xml version="1.0"?>
+<st-source>
+<class>
+<class-id>EmployeeListView</class-id>
+<superclass>ListBox</superclass>
+<instance-variables>employees selectionChangedBlock</instance-variables>
+<class-variables></class-variables>
+<pool-dictionaries></pool-dictionaries>
+<methods>
+<body package="EmployeeManagement-GUI" selector="initialize">
+initialize
+    super initialize.
+    employees := OrderedCollection new.
+    self
+        multipleSelection: false;
+        hasHorizontalScrollBar: true;
+        hasVerticalScrollBar: true.
+    self onSelectionChanged: [self handleSelectionChanged].
+</body>
+<body package="EmployeeManagement-GUI" selector="displayEmployees:">
+displayEmployees: employeeCollection
+    employees := employeeCollection copy.
+    self removeAll.
+    employees do: [:employee |
+        self addItem: employee displayString
+    ].
+</body>
+<body package="EmployeeManagement-GUI" selector="onSelectionChanged:">
+onSelectionChanged: aBlock
+    selectionChangedBlock := aBlock
+</body>
+<body package="EmployeeManagement-GUI" selector="handleSelectionChanged">
+handleSelectionChanged
+    | selectedIndex selectedEmployee |
+    selectedIndex := self selectedIndex.
+    selectedEmployee := selectedIndex > 0
+        ifTrue: [employees at: selectedIndex]
+        ifFalse: [nil].
+    selectionChangedBlock ifNotNil: [
+        selectionChangedBlock value: selectedEmployee
+    ].
+</body>
+<body package="EmployeeManagement-GUI" selector="selectedEmployee">
+selectedEmployee
+    | selectedIndex |
+    selectedIndex := self selectedIndex.
+    ^selectedIndex > 0
+        ifTrue: [employees at: selectedIndex]
+        ifFalse: [nil]
+</body>
+<body package="EmployeeManagement-GUI" selector="employeeCount">
+employeeCount
+    ^employees size
+</body>
+</methods>
+</class>
+</st-source>

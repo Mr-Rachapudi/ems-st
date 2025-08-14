@@ -1,0 +1,191 @@
+<?xml version="1.0"?>
+<st-source>
+<class>
+<class-id>EmployeeManagementWindow</class-id>
+<superclass>ApplicationWindow</superclass>
+<instance-variables>employeeListView employeeFormView searchView currentEmployee service</instance-variables>
+<class-variables></class-variables>
+<pool-dictionaries></pool-dictionaries>
+<methods>
+<body package="EmployeeManagement-GUI" selector="initialize">
+initialize
+    super initialize.
+    service := EmployeeService instance.
+    self initializeWindow.
+    self initializeComponents.
+    self layoutComponents.
+    self refreshEmployeeList.
+</body>
+<body package="EmployeeManagement-GUI" selector="initializeWindow">
+initializeWindow
+    self
+        title: 'Employee Management System';
+        bounds: (Rectangle origin: 100@100 extent: 800@600);
+        minimumSize: 600@400.
+</body>
+<body package="EmployeeManagement-GUI" selector="initializeComponents">
+initializeComponents
+    employeeListView := EmployeeListView new.
+    employeeFormView := EmployeeFormView new.
+    searchView := EmployeeSearchView new.
+    
+    employeeListView onSelectionChanged: [:employee | self selectEmployee: employee].
+    employeeFormView onSave: [:employee | self saveEmployee: employee].
+    employeeFormView onCancel: [self clearSelection].
+    searchView onSearch: [:criteria | self searchEmployees: criteria].
+</body>
+<body package="EmployeeManagement-GUI" selector="layoutComponents">
+layoutComponents
+    | mainPanel leftPanel rightPanel |
+    mainPanel := Panel new.
+    leftPanel := Panel new.
+    rightPanel := Panel new.
+    
+    leftPanel
+        add: searchView withConstraints: #top;
+        add: employeeListView withConstraints: #fill.
+    
+    rightPanel
+        add: employeeFormView withConstraints: #fill.
+    
+    mainPanel
+        add: leftPanel withConstraints: (LayoutConstraints new leftFraction: 0; rightFraction: 0.5);
+        add: rightPanel withConstraints: (LayoutConstraints new leftFraction: 0.5; rightFraction: 1).
+    
+    self add: mainPanel withConstraints: #fill.
+</body>
+<body package="EmployeeManagement-GUI" selector="selectEmployee:">
+selectEmployee: anEmployee
+    currentEmployee := anEmployee.
+    employeeFormView displayEmployee: anEmployee.
+</body>
+<body package="EmployeeManagement-GUI" selector="clearSelection">
+clearSelection
+    currentEmployee := nil.
+    employeeFormView clearForm.
+</body>
+<body package="EmployeeManagement-GUI" selector="saveEmployee:">
+saveEmployee: anEmployee
+    [
+        anEmployee id ifNil: [
+            service createEmployee: anEmployee.
+            self showMessage: 'Employee created successfully'.
+        ] ifNotNil: [
+            service updateEmployee: anEmployee.
+            self showMessage: 'Employee updated successfully'.
+        ].
+        self refreshEmployeeList.
+        self clearSelection.
+    ] on: Error do: [:ex |
+        self showError: ex messageText
+    ]
+</body>
+<body package="EmployeeManagement-GUI" selector="deleteSelectedEmployee">
+deleteSelectedEmployee
+    currentEmployee ifNil: [
+        self showMessage: 'Please select an employee to delete'.
+        ^self
+    ].
+    
+    (self confirm: 'Are you sure you want to delete ', currentEmployee name, '?') ifTrue: [
+        [
+            service deleteEmployee: currentEmployee.
+            self showMessage: 'Employee deleted successfully'.
+            self refreshEmployeeList.
+            self clearSelection.
+        ] on: Error do: [:ex |
+            self showError: ex messageText
+        ]
+    ]
+</body>
+<body package="EmployeeManagement-GUI" selector="searchEmployees:">
+searchEmployees: searchCriteria
+    | results |
+    [
+        results := searchCriteria isEmpty
+            ifTrue: [service readAllEmployees]
+            ifFalse: [service searchEmployeesByName: searchCriteria].
+        employeeListView displayEmployees: results.
+    ] on: Error do: [:ex |
+        self showError: ex messageText
+    ]
+</body>
+<body package="EmployeeManagement-GUI" selector="refreshEmployeeList">
+refreshEmployeeList
+    [
+        employeeListView displayEmployees: service readAllEmployees.
+    ] on: Error do: [:ex |
+        self showError: ex messageText
+    ]
+</body>
+<body package="EmployeeManagement-GUI" selector="createMenuBar">
+createMenuBar
+    | menuBar fileMenu employeeMenu helpMenu |
+    menuBar := MenuBar new.
+    
+    fileMenu := Menu new.
+    fileMenu
+        addItem: 'New Employee' action: [self newEmployee];
+        addItem: 'Refresh' action: [self refreshEmployeeList];
+        addSeparator;
+        addItem: 'Exit' action: [self close].
+    
+    employeeMenu := Menu new.
+    employeeMenu
+        addItem: 'Create Employee' action: [self newEmployee];
+        addItem: 'Edit Employee' action: [self editSelectedEmployee];
+        addItem: 'Delete Employee' action: [self deleteSelectedEmployee];
+        addSeparator;
+        addItem: 'Search Employees' action: [self focusSearch].
+    
+    helpMenu := Menu new.
+    helpMenu
+        addItem: 'About' action: [self showAbout].
+    
+    menuBar
+        addMenu: fileMenu label: 'File';
+        addMenu: employeeMenu label: 'Employee';
+        addMenu: helpMenu label: 'Help'.
+    
+    self menuBar: menuBar.
+</body>
+<body package="EmployeeManagement-GUI" selector="newEmployee">
+newEmployee
+    self clearSelection.
+    employeeFormView displayEmployee: Employee new.
+</body>
+<body package="EmployeeManagement-GUI" selector="editSelectedEmployee">
+editSelectedEmployee
+    currentEmployee ifNil: [
+        self showMessage: 'Please select an employee to edit'.
+    ]
+</body>
+<body package="EmployeeManagement-GUI" selector="focusSearch">
+focusSearch
+    searchView focusSearchField.
+</body>
+<body package="EmployeeManagement-GUI" selector="showAbout">
+showAbout
+    self showMessage: 'Employee Management System v1.0
+Built with ObjectStudio ANSI Smalltalk
+© 2025 Employee Management Solutions'
+</body>
+<body package="EmployeeManagement-GUI" selector="showMessage:">
+showMessage: aMessage
+    MessageBox information: aMessage
+</body>
+<body package="EmployeeManagement-GUI" selector="showError:">
+showError: anErrorMessage
+    MessageBox error: anErrorMessage
+</body>
+<body package="EmployeeManagement-GUI" selector="confirm:">
+confirm: aMessage
+    ^MessageBox question: aMessage
+</body>
+<body package="EmployeeManagement-GUI" selector="EmployeeManagementWindow class>>open">
+open
+    ^self new open
+</body>
+</methods>
+</class>
+</st-source>

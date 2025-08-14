@@ -1,0 +1,66 @@
+<?xml version="1.0"?>
+<st-source>
+<class>
+<class-id>EmployeeSearchView</class-id>
+<superclass>Panel</superclass>
+<instance-variables>searchField searchButton clearButton searchBlock</instance-variables>
+<class-variables></class-variables>
+<pool-dictionaries></pool-dictionaries>
+<methods>
+<body package="EmployeeManagement-GUI" selector="initialize">
+initialize
+    super initialize.
+    self initializeComponents.
+    self layoutComponents.
+</body>
+<body package="EmployeeManagement-GUI" selector="initializeComponents">
+initializeComponents
+    searchField := TextField new.
+    searchButton := Button new.
+    clearButton := Button new.
+    
+    searchField onTextChanged: [self performSearch].
+    
+    searchButton
+        text: 'Search';
+        onClicked: [self performSearch].
+    
+    clearButton
+        text: 'Clear';
+        onClicked: [self clearSearch].
+</body>
+<body package="EmployeeManagement-GUI" selector="layoutComponents">
+layoutComponents
+    | searchPanel |
+    searchPanel := Panel new.
+    
+    searchPanel
+        add: (Label new text: 'Search:');
+        add: searchField;
+        add: searchButton;
+        add: clearButton.
+    
+    self add: searchPanel withConstraints: #fill.
+</body>
+<body package="EmployeeManagement-GUI" selector="performSearch">
+performSearch
+    | searchTerm |
+    searchTerm := searchField text.
+    searchBlock ifNotNil: [searchBlock value: searchTerm].
+</body>
+<body package="EmployeeManagement-GUI" selector="clearSearch">
+clearSearch
+    searchField text: ''.
+    self performSearch.
+</body>
+<body package="EmployeeManagement-GUI" selector="focusSearchField">
+focusSearchField
+    searchField focus.
+</body>
+<body package="EmployeeManagement-GUI" selector="onSearch:">
+onSearch: aBlock
+    searchBlock := aBlock
+</body>
+</methods>
+</class>
+</st-source>

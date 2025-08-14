@@ -1,0 +1,79 @@
+<?xml version="1.0"?>
+<st-source>
+<class>
+<class-id>DeleteEmployeeValidator</class-id>
+<superclass>Object</superclass>
+<instance-variables></instance-variables>
+<class-variables></class-variables>
+<pool-dictionaries></pool-dictionaries>
+<methods>
+<body package="EmployeeManagement-Validation" selector="validateEmployeeForDeletion:">
+validateEmployeeForDeletion: anEmployee
+    | errors |
+    errors := OrderedCollection new.
+    
+    self validateEmployeeId: anEmployee id errors: errors.
+    self validateEmployeeExists: anEmployee errors: errors.
+    self validateDeletionPermissions: anEmployee errors: errors.
+    
+    ^errors
+</body>
+<body package="EmployeeManagement-Validation" selector="validateEmployeeId:errors:">
+validateEmployeeId: anId errors: errors
+    anId ifNil: [errors add: 'Employee ID cannot be nil for deletion'. ^self].
+    anId isInteger ifFalse: [errors add: 'Employee ID must be an integer'. ^self].
+    anId <= 0 ifTrue: [errors add: 'Employee ID must be greater than 0'. ^self].
+</body>
+<body package="EmployeeManagement-Validation" selector="validateEmployeeExists:errors:">
+validateEmployeeExists: anEmployee errors: errors
+    anEmployee ifNil: [errors add: 'Employee does not exist and cannot be deleted'. ^self].
+    anEmployee name ifNil: [errors add: 'Employee record is incomplete'. ^self].
+    anEmployee name isEmpty ifTrue: [errors add: 'Employee record is incomplete'. ^self].
+</body>
+<body package="EmployeeManagement-Validation" selector="validateDeletionPermissions:errors:">
+validateDeletionPermissions: anEmployee errors: errors
+    anEmployee ifNil: [^self].
+    
+    anEmployee department = 'HR' ifTrue: [
+        errors add: 'HR employees require special approval for deletion'
+    ].
+    
+    anEmployee salary > 100000 ifTrue: [
+        errors add: 'High-salary employees require manager approval for deletion'
+    ].
+    
+    (Date today subtractDays: anEmployee hireDate) < 30 ifTrue: [
+        errors add: 'Recently hired employees (less than 30 days) require HR approval for deletion'
+    ].
+</body>
+<body package="EmployeeManagement-Validation" selector="validateReferentialIntegrity:">
+validateReferentialIntegrity: anEmployee
+    | errors |
+    errors := OrderedCollection new.
+    
+    anEmployee ifNil: [^errors].
+    
+    ^errors
+</body>
+<body package="EmployeeManagement-Validation" selector="validateDeletionReason:">
+validateDeletionReason: reason
+    | errors validReasons |
+    errors := OrderedCollection new.
+    validReasons := #('Resignation' 'Termination' 'Retirement' 'Transfer' 'Other').
+    
+    reason ifNil: [errors add: 'Deletion reason is required'. ^errors].
+    reason isEmpty ifTrue: [errors add: 'Deletion reason cannot be empty'. ^errors].
+    
+    (validReasons includes: reason) ifFalse: [
+        errors add: 'Deletion reason must be one of: ', (validReasons joinSeparatedBy: ', ')
+    ].
+    
+    ^errors
+</body>
+<body package="EmployeeManagement-Validation" selector="DeleteEmployeeValidator class>>new">
+new
+    ^super new
+</body>
+</methods>
+</class>
+</st-source>
